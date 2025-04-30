@@ -383,7 +383,7 @@ class LabelModelWrapper:
 
         self.label_matrix = label_matrix.to_numpy()
         self.y_train = y_train
-        self.n_classes = n_classes
+        self.n_classes = 19
         self.LF_names = list(label_matrix.columns)
         self.learned_weights = None  # learned weights of the labeling functions
         self.trained = False  # The label model is not trained yet
