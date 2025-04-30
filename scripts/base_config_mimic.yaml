@@ -18,7 +18,7 @@ label_model_lr: 0.01
 label_model_n_epochs: 100
 max_num: 500
 min_df: 0.001
-model_path: ../models/mimic/
+model_path: /content/drive/MyDrive/CS598DHL_RawFiles/CS598DHL_Project/keyclass/models/mimic/
 n_bootstrap: 100
 n_classes: 1
 n_jobs: 10
@@ -26,9 +26,9 @@ ngram_range: !!python/tuple
 - 1
 - 3
 normalize_embeddings: false
-preds_path: ../results/mimic/
+preds_path: /content/drive/MyDrive/CS598DHL_RawFiles/CS598DHL_Project/keyclass/results/mimic/
 q_update_interval: 50
-results_path: ../results/mimic/
+results_path: /content/drive/MyDrive/CS598DHL_RawFiles/CS598DHL_Project/keyclass/results/mimic/
 self_train_batch_size: 128
 self_train_lr: 1e-6
 self_train_patience: 8
