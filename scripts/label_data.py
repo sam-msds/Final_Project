@@ -23,7 +23,7 @@
 
 import sys
 
-sys.path.append('../keyclass/')
+sys.path.append('..')
 
 import utils
 import models
