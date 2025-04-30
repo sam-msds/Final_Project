@@ -10,7 +10,7 @@ cd keyclass/scripts/
 
 mkdir data/
 cd data/
-FILE_ID="1HlYlNJ8dxR5OrCrWzDZrpoveHWLWTtuL" #Full MIMIC DATASET
+FILE_ID="1eK0DS8NdCOev4lJKggpMrzD_AzGNm4eN" #Full MIMIC DATASET
 #FILE_ID="1DaXCjzs8I4PCpzaldaDNIublK4MedD-_" #10 MIMIC DATASET
 URL="https://drive.google.com/uc?export=download&id=$FILE_ID"
 echo ${green}===Downloading MIMIC Data...===${reset}
@@ -23,6 +23,6 @@ cd -- "$BASE_PATH"
 cd CS598DLH_Project/keyclass/scripts/
 python config_creator.py
 python run_all_configs.py
-CONFIG_LOCATION="${BASE_PATH}keyclass/config_files/config_mimic.yaml"
+CONFIG_LOCATION="${BASE_PATH}CS598DLH_Project/keyclass/config_files/config_mimic.yaml"
 echo $CONFIG_LOCATION
 python run_all.py --config $CONFIG_LOCATION

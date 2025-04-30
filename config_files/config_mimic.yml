@@ -2,7 +2,7 @@ activation: torch.nn.LeakyReLU()
 average: weighted
 base_encoder: paraphrase-mpnet-base-v2
 criterion: torch.nn.BCEWithLogitsLoss(reduction='none')
-data_path: /content/CS598DHL_Project/keyclass/scripts/data/ # Change it to base path/KeyClass/....
+data_path: /content/drive/MyDrive/CS598DHL_RawFiles/CS598DHL_Project/keyclass/scripts/data/ # Change it to base path/KeyClass/....
 dataset: mimic
 device: cuda
 end_model_batch_size: 1 # Make 128 in Final run
