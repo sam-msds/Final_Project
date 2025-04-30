@@ -1,6 +1,6 @@
 import subprocess
 
-base_filename = "/content/CS598DLH_Project/KeyClass/scripts/config_mimic_"
+base_filename = "/content/CS598DLH_Project/keyclass/scripts/config_mimic_"
 base_file_extension = '.yaml'
 
 for i in range(0,19):
