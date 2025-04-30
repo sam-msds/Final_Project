@@ -5,7 +5,7 @@ git clone https://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@github.com/sam-msds/C
 cd CS598DLH_Project
 #mv One-Versus-Not KeyClass
 mv scripts keyclass
-#pip install snorkel sentence-transformers pyhealth transformers
+pip install snorkel sentence-transformers  transformers
 cd keyclass/scripts/
 
 mkdir data/
