@@ -132,7 +132,9 @@ class CustomEncoder(torch.nn.Module):
         all_embeddings = []
 
         length_sorted_idx = np.argsort(
-            [-utils._text_length(sen) for sen in sentences])
+            #chatgpt[-utils._text_length(sen) for sen in sentences]
+            [-utils._text_length(sen[0]) for sen in sentences]
+)
         # length_sorted_idx = np.argsort([-self.model._text_length(sen) for sen in sentences])
 
         sentences_sorted = [sentences[idx] for idx in length_sorted_idx]
