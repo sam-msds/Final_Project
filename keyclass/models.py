@@ -369,7 +369,7 @@ class LabelModelWrapper:
     def __init__(self,
                  label_matrix,
                  y_train=None,
-                 n_classes=2,
+                 n_classes=20,
                  device='cuda',
                  model_name='data_programming'):
         if not isinstance(label_matrix, pd.DataFrame):
