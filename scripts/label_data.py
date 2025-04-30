@@ -51,7 +51,9 @@ def run(args_cmd):
         with open(join(args['data_path'], args['dataset'], 'train_labels.txt'),
                   'r') as f:
             y_train = f.readlines()
-        y_train = np.array([int(i.replace('\n', '')) for i in y_train])
+        #chatgpty_train = np.array([int(i.replace('\n', '')) for i in y_train])
+        y_train = np.array([int(val) for i in y_train for val in i.replace('\n', '').split(',')])
+
         training_labels_present = True
     else:
         y_train = None
