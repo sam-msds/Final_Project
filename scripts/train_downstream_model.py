@@ -173,9 +173,9 @@ def train(args_cmd):
         torch.save(model, f)
 
     end_model_preds_train = model.predict_proba(
-        torch.from_numpy(X_train_embed_masked), batch_size=512, raw_text=False)
+        torch.from_numpy(X_train_embed_masked), batch_size=4, raw_text=False)
     end_model_preds_test = model.predict_proba(torch.from_numpy(X_test_embed),
-                                               batch_size=512,
+                                               batch_size=4,
                                                raw_text=False)
 
     # Save the predictions
@@ -285,9 +285,9 @@ def test(args_cmd, end_model_path, end_model_self_trained_path):
     model = torch.load(end_model_path)
 
     end_model_preds_train = model.predict_proba(
-        torch.from_numpy(X_train_embed_masked), batch_size=512, raw_text=False)
+        torch.from_numpy(X_train_embed_masked), batch_size=4, raw_text=False)
     end_model_preds_test = model.predict_proba(torch.from_numpy(X_test_embed),
-                                               batch_size=512,
+                                               batch_size=4,
                                                raw_text=False)
 
     # Print statistics

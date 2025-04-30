@@ -91,7 +91,7 @@ class CustomEncoder(torch.nn.Module):
 
     def encode(self,
                sentences: Union[str, List[str]],
-               batch_size: int = 32,
+               batch_size: int = 4,
                show_progress_bar: Optional[bool] = False,
                normalize_embeddings: bool = False):
         """
@@ -114,7 +114,7 @@ class CustomEncoder(torch.nn.Module):
 
     def forward(self,
                 sentences: Union[str, List[str]],
-                batch_size: int = 32,
+                batch_size: int = 4,
                 show_progress_bar: Optional[bool] = None,
                 normalize_embeddings: bool = False):
         """
@@ -199,7 +199,7 @@ class Encoder(torch.nn.Module):
 
     def encode(self,
                sentences: Union[str, List[str]],
-               batch_size: int = 32,
+               batch_size: int = 4,
                show_progress_bar: Optional[bool] = False,
                normalize_embeddings: bool = False):
         """
@@ -223,7 +223,7 @@ class Encoder(torch.nn.Module):
 
     def forward(self,
                 sentences: Union[str, List[str]],
-                batch_size: int = 32,
+                batch_size: int = 4,
                 show_progress_bar: Optional[bool] = False,
                 normalize_embeddings: bool = False):
         """
@@ -325,14 +325,14 @@ class FeedForwardFlexible(torch.nn.Module):
 
         return x
 
-    def predict(self, x_test, batch_size=128, raw_text=True):
+    def predict(self, x_test, batch_size=4, raw_text=True):
         preds = self.predict_proba(x_test,
                                    batch_size=batch_size,
                                    raw_text=raw_text)
         preds = np.argmax(preds, axis=1)
         return preds
 
-    def predict_proba(self, x_test, batch_size=128, raw_text=True):
+    def predict_proba(self, x_test, batch_size=4, raw_text=True):
         with torch.no_grad():
             self.eval()
             probs_list = []
