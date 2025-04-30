@@ -23,11 +23,10 @@
 
 # Encode all datasets
 
-DATA_PATH="/zfsauton/project/public/chufang/classes/"
+DATA_PATH="/content/drive/MyDrive/CS598DHL_RawFiles/CS598DLH_Project/keyclass/scripts/data/"
 # DATA_PATH = "../datasets/" # Uncomment
 
-# DATASETS=('imdb' 'agnews' 'amazon' 'dbpedia')
-DATASETS=('imdb')
+DATASETS=('mimic')
 
 MODEL_NAME="all-mpnet-base-v2"
 
