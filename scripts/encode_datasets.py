@@ -48,6 +48,7 @@ def run(args_cmd):
         sentences = utils.fetch_data(dataset=args['dataset'],
                                      split=split,
                                      path=args['data_path'])
+        sentences = [(s, None) for s in sentences] 
         embeddings = model.encode(
             sentences=sentences,
             batch_size=args['end_model_batch_size'],
