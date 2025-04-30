@@ -423,6 +423,12 @@ class LabelModelWrapper:
             seed: int
                 A random seed to initialize the random number generator with
         """
+        valid_labels = self.label_matrix[self.label_matrix != -1]
+        if valid_labels.size == 0:
+            raise ValueError("Label matrix contains only abstain values (-1). Cannot determine number of classes.")
+            self.n_classes = int(valid_labels.max()) + 1
+
+
         print(f'==== Training the label model ====')
         if self.model_name == 'data_programming':
             self.label_model = LabelModel(cardinality=self.n_classes,
