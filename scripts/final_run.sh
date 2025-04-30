@@ -13,9 +13,9 @@ cd data/
 FILE_ID="1eK0DS8NdCOev4lJKggpMrzD_AzGNm4eN" #Full MIMIC DATASET
 #FILE_ID="1DaXCjzs8I4PCpzaldaDNIublK4MedD-_" #10 MIMIC DATASET
 URL="https://drive.google.com/uc?export=download&id=$FILE_ID"
-echo ${green}===Downloading MIMIC Data...===${reset}
-wget --load-cookies /tmp/cookies.txt "https://drive.google.com/uc?export=download&confirm=$(wget --quiet --save-cookies /tmp/cookies.txt --keep-session-cookies --no-check-certificate $URL -O- | sed -rn 's/.*confirm=([0-9A-Za-z_]+).*/\1\n/p')&id=$FILE_ID" -O "mimic.zip" && rm -rf /tmp/cookies.txt
-echo ${green}===Unzipping MIMIC Data...===${reset}
+#echo ${green}===Downloading MIMIC Data...===${reset}
+#wget --load-cookies /tmp/cookies.txt "https://drive.google.com/uc?export=download&confirm=$(wget --quiet --save-cookies /tmp/cookies.txt --keep-session-cookies --no-check-certificate $URL -O- | sed -rn 's/.*confirm=([0-9A-Za-z_]+).*/\1\n/p')&id=$FILE_ID" -O "mimic.zip" && rm -rf /tmp/cookies.txt
+#echo ${green}===Unzipping MIMIC Data...===${reset}
 jar xvf mimic.zip && rm mimic.zip
 #mv small-mimic mimic
 
