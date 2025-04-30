@@ -40,6 +40,7 @@ def get_vocabulary(text_corpus, max_df=1.0, min_df=0.01, ngram_range=(1, 1)):
     vocabulary. 
 
     """
+
     # Vectorizing the vocabulary
     vectorizer = CountVectorizer(max_df=max_df,
                                  min_df=min_df,
@@ -144,8 +145,15 @@ class CreateLabellingFunctions:
         self.label_embeddings = self.encoder.encode(sentences=label_names)
 
         ## get vocab according to n-grams
+        #self.word_indicator_matrix, self.vocabulary = get_vocabulary(\
+        #    text_corpus=text_corpus,
+        #    max_df=1.0,
+        #    min_df=min_df,
+        #    ngram_range=ngram_range)
+
+        flattened_corpus = [' '.join(text) if isinstance(text, list) else text for text in text_corpus]
         self.word_indicator_matrix, self.vocabulary = get_vocabulary(\
-            text_corpus=text_corpus,
+            text_corpus=flattened_corpus,
             max_df=1.0,
             min_df=min_df,
             ngram_range=ngram_range)
