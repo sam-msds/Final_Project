@@ -138,7 +138,7 @@ class CreateLabellingFunctions:
                    label_model_lr,
                    label_model_n_epochs,
                    verbose=True,
-                   n_classes=2):
+                   n_classes=20):
         ## main driver function
 
         ## get the bert embeddings of the categories
