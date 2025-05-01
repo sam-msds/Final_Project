@@ -261,7 +261,7 @@ class Parser:
     def __init__(
             self,
             config_file_path='../config_files/default_config.yml',
-            default_config_file_path='/content/drive/MyDrive/CS598DHL_RawFiles/CS598DLH_Project/config_files/default_config.yml'):
+            default_config_file_path='/content/drive/MyDrive/CS598DLH_KeyClass_Reproduce/CS598DLH_Project/config_files/default_config.yml'):
         """Class to read and parse the config.yml file
 		"""
         self.config_file_path = config_file_path

@@ -43,12 +43,12 @@ def run(args_cmd):
 
     # Load training data
     train_text = utils.fetch_data(dataset=args['dataset'],
-                                  path=args['data_path'],
+                                  path=args['/content/drive/MyDrive/CS598DLH_KeyClass_Reproduce/CS598DLH_Project/keyclass/scripts/data/'],
                                   split='train')
 
     training_labels_present = False
-    if exists(join(args['data_path'], args['dataset'], 'train_labels.txt')):
-        with open(join(args['data_path'], args['dataset'], 'train_labels.txt'),
+    if exists(join(args['/content/drive/MyDrive/CS598DLH_KeyClass_Reproduce/CS598DLH_Project/keyclass/scripts/data/'], args['dataset'], 'train_labels.txt')):
+        with open(join(args['/content/drive/MyDrive/CS598DLH_KeyClass_Reproduce/CS598DLH_Project/keyclass/scripts/data/'], args['dataset'], 'train_labels.txt'),
                   'r') as f:
             y_train = f.readlines()
         #chatgpty_train = np.array([int(i.replace('\n', '')) for i in y_train])
@@ -60,7 +60,7 @@ def run(args_cmd):
         training_labels_present = False
         print('No training labels found!')
 
-    with open(join(args['data_path'], args['dataset'], 'train_embeddings.pkl'),
+    with open(join(args['/content/drive/MyDrive/CS598DLH_KeyClass_Reproduce/CS598DLH_Project/keyclass/scripts/data/'], args['dataset'], 'train_embeddings.pkl'),
               'rb') as f:
         X_train = pickle.load(f)
 
@@ -95,9 +95,9 @@ def run(args_cmd):
     y_train_pred = np.argmax(proba_preds, axis=1)
 
     # Save the predictions
-    if not os.path.exists(args['preds_path']): os.makedirs(args['preds_path'])
+    if not os.path.exists(args['/content/drive/MyDrive/CS598DLH_KeyClass_Reproduce/CS598DLH_Project/keyclass/results/mimic/']): os.makedirs(args['preds_path'])
     with open(
-            join(args['preds_path'], f"{args['label_model']}_proba_preds.pkl"),
+            join(args['/content/drive/MyDrive/CS598DLH_KeyClass_Reproduce/CS598DLH_Project/keyclass/results/mimic/'], f"{args['label_model']}_proba_preds.pkl"),
             'wb') as f:
         pickle.dump(proba_preds, f)
 
