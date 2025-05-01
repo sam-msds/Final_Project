@@ -32,6 +32,8 @@ from datetime import datetime
 import torch
 from yaml import load, dump
 from yaml import CLoader as Loader, CDumper as Dumper
+from nltk.corpus import stopwords
+import csv
 
 
 def log(metrics: Union[List, Dict], filename: str, results_dir: str,
@@ -74,47 +76,40 @@ def log(metrics: Union[List, Dict], filename: str, results_dir: str,
         f.write(json.dumps(results))
 
 
-
 def compute_metrics(y_preds: np.array,
                     y_true: np.array,
-                    average: str = 'weighted'):
-    """Compute accuracy, precision, and recall.
+                    average: str = 'weighted', 
+                    multilabel: bool = False):
+    """Compute accuracy, recall and precision
 
         Parameters
         ----------
         y_preds: np.array
-            Predictions (could be class probabilities or class labels)
+            Predictions
         
         y_true: np.array
-            Ground truth labels (could be class labels or multi-hot encoded)
+            Ground truth labels
         
         average: str
-            Averaging method for multiclass/multilabel classification.
-            Options: 'micro', 'macro', 'weighted', 'samples', or None.
+            This parameter is required for multiclass/multilabel targets. If None, 
+            the scores for each class are returned. Otherwise, this determines the 
+            type of averaging performed on the data.
     """
-    
-    # If y_preds is a 2D array (probabilities/logits), convert it to class labels
-    if len(y_preds.shape) == 2:
-        y_preds = np.argmax(y_preds, axis=1)
-    
-    # If y_true is multi-hot encoded (2D), convert it to class labels
-    if len(y_true.shape) == 2:
-        y_true = np.argmax(y_true, axis=1)
+    y_preds = [(y_preds[i] in labels) for i,labels in enumerate(y_true)]
+    y_true = np.ones_like(y_preds)
+    return [
+        np.mean(y_preds == y_true),
+        precision_score(y_true, y_preds, average=average),
+        recall_score(y_true, y_preds, average=average)
+    ]
 
-    # Compute accuracy
-    accuracy = np.mean(y_preds == y_true)
-
-    # Compute precision and recall
-    precision = precision_score(y_true, y_preds, average=average)
-    recall = recall_score(y_true, y_preds, average=average)
-
-    return accuracy, precision, recall
 
 def compute_metrics_bootstrap(y_preds: np.array,
                               y_true: np.array,
                               average: str = 'weighted',
                               n_bootstrap: int = 100,
-                              n_jobs: int = 10):
+                              n_jobs: int = 10,
+                              multilabel: bool = False):
     """Compute bootstrapped confidence intervals (CIs) around metrics of interest. 
 
         Parameters
@@ -138,7 +133,7 @@ def compute_metrics_bootstrap(y_preds: np.array,
     """
     output_ =  joblib.Parallel(n_jobs=n_jobs, verbose=1)(
                                 joblib.delayed(compute_metrics)
-                                    (y_preds[boostrap_inds], y_true[boostrap_inds]) \
+                                    (y_preds[boostrap_inds], y_true[boostrap_inds], multilabel=multilabel) \
                                     for boostrap_inds in [\
                                     np.random.choice(a=len(y_true), size=len(y_true)) for k in range(n_bootstrap)])
     output_ = np.array(output_)
@@ -189,32 +184,36 @@ def get_balanced_data_mask(proba_preds: np.array,
 def clean_text(sentences: Union[str, List[str]]):
     """Utility function to clean sentences
     """
-    if isinstance(sentences, str):
-        sentences = [sentences]
-
-    for i, text in enumerate(sentences):
+    # if isinstance(sentences, str):
+    #     sentences = [sentences]
+    cachedStopWords = stopwords.words("english")
+    def clean(text):
+        tmp = text
         text = text.lower()
-        text = re.sub(r'<.*?>|[\.`\',;\?\*\[\]\(\)-:_]*|[0-9]*', '', text)
-        text = re.sub(r'[\r\n]+', ' ', text)
-        text = re.sub(r'[^\x00-\x7F]+', ' ', text)
-        sentences[i] = text
-
-    return sentences
+        text = re.sub(r'[^a-zA-Z\s]', ' ', text)
+        text = re.sub(r'\s+',' ', text)
+        return text
+    if isinstance(sentences, str):
+        return clean(sentences)
+    else:
+        for i, text in enumerate(sentences):
+            sentences[i] = clean(text)
+        return sentences
 
 
 def fetch_data(dataset='imdb', path='~/', split='train'):
     """Fetches a dataset by its name
 
-	    Parameters
-	    ---------- 
-	    dataset: str
-	        List of text to be encoded. 
+        Parameters
+        ---------- 
+        dataset: str
+            List of text to be encoded. 
 
-	    path: str
-	        Path to the stored data. 
+        path: str
+            Path to the stored data. 
 
-	    split: str
-	        Whether to fetch the train or test dataset. Options are one of 'train' or 'test'. 
+        split: str
+            Whether to fetch the train or test dataset. Options are one of 'train' or 'test'. 
     """
     #_dataset_names = ['agnews', 'amazon', 'dbpedia', 'imdb', 'mimic']
     #if dataset not in _dataset_names:
@@ -261,10 +260,8 @@ def _text_length(text: Union[List[int], List[List[int]]]):
                                       int):  #Empty string or list of ints
         return len(text)
     else:
-        return sum([len(t) for t in text if t is not None])
-
-        #return sum([len(t)
-         #           for t in text])  #Sum of length of individual strings
+        return sum([len(t)
+                    for t in text])  #Sum of length of individual strings
 
 
 class Parser:
@@ -272,9 +269,9 @@ class Parser:
     def __init__(
             self,
             config_file_path='../config_files/default_config.yml',
-            default_config_file_path='/content/drive/MyDrive/CS598DLH_KeyClass_Reproduce/CS598DLH_Project/config_files/default_config.yml'):
+            default_config_file_path='../config_files/default_config.yml'):
         """Class to read and parse the config.yml file
-		"""
+        """
         self.config_file_path = config_file_path
         with open(default_config_file_path, 'rb') as f:
             self.default_config = load(f, Loader=Loader)
@@ -303,3 +300,110 @@ class Parser:
     def save_config(self):
         with open(self.config_file_path, 'w') as f:
             dump(self.config, f)
+
+            
+def read_clinicalNote(path, codeIdx, textIdx, icdCodeList = []):
+    """
+    Reads in a clinical note and returns a list of tokens as well as the ICD9 codes 
+    associated with the file. 
+    Example: 
+    Attributes:
+    Args:
+        path str: Path to clinical note csv
+        codeIdx int: Column index which contains icd codes
+        textIdx int: Column index which contains textIdx
+        icdCodeList list: List which will contian all unique icd9 codes
+        
+    Returns:
+    TODO:
+        1)
+    """
+    expectedHeader = ['', 'HADM_ID', 'SUBJECT_ID', 'ICD9_CODE', 'CHARTDATE', 'DESCRIPTION', 'TEXT'] # old version.
+    expectedHeader = ["","HADM_ID","SUBJECT_ID","ICD9_CODE","CHARTDATE","DESCRIPTION","TEXT","Level2ICD","TopLevelICD","...9"]
+    # codeIdx = 9
+    # textIdx = 6
+    ret = []
+
+    current_toks, current_lbls = [], []
+    # print(path)
+    
+    def handle_labels(label_str):
+        label_list = label_str.replace('cat:','').split('-')
+        label_list = [str(int(x)-1) for x in label_list if x!='18' and x!='19']
+        if len(label_list)==0:
+            return None
+        return np.array((label_list[0], ' '.join(label_list)))
+    
+    with open(path, 'r') as csvfile:
+        csvReader = csv.reader(csvfile, delimiter=',', quotechar='\"', skipinitialspace=True)
+        assert next(csvReader) == expectedHeader #checking that the header matches what we expect. 
+        for row in csvReader:
+            # handle return of empty list
+            try:
+                label, all_labels = handle_labels(row[codeIdx])
+            except:
+                continue
+            ret.append((row[textIdx].split(), label, all_labels))
+    # 1/0
+    #print(ret)
+    return np.asarray(ret, dtype="object")
+
+def normalize(word):
+    """
+    Normalize words that are numbers or have casing.
+    
+    Example: 
+    Attributes:
+    Args:
+        
+    Returns:
+        
+    TODO:
+        1)
+    """
+    word = re.sub(r'[^a-zA-Z]', '', word)
+    if word == '': return None
+    else: return word.lower()
+    
+def process_notes(notes, max_word_length):
+    cleaned_notes = []
+    for tagged_note in notes:
+        note = tagged_note[0]
+        ret_size = min(len(note), max_word_length)
+        note = ' '.join([normalize(word) for word in note if normalize(word) is not None][:ret_size])
+        cleaned_notes.append((note, tagged_note[1], tagged_note[2]))
+    return np.array(cleaned_notes)
+
+def write_to_file(cleaned_notes, split, outpath='mimic/'):
+    np.savetxt(f'{outpath}{split}.txt',cleaned_notes[:,0], fmt='%s')
+    np.savetxt(f'{outpath}{split}_labels.txt',cleaned_notes[:,1], fmt='%s')
+    np.savetxt(f'{outpath}{split}_labels_all.txt',cleaned_notes[:,2], fmt='%s')
+
+def load_and_process_data(train_path, test_path, out_dir, max_length=1000, random_state=1234, sample_size=None):
+    codeIdx = 9
+    textIdx = 6
+    train_raw  = read_clinicalNote(train_path, codeIdx, textIdx)
+    test_raw = read_clinicalNote(test_path, codeIdx, textIdx)
+    
+    if sample_size is not None:
+        np.random.RandomState(random_state)
+        train_idxs = np.random.choice(
+            range(train_raw.shape[0]),
+            replace=False,
+            size=int(train_raw.shape[0] * sample_size),
+        ).astype(int)  # Ensuring integers
+
+        test_idxs = np.random.choice(
+            range(test_raw.shape[0]),
+            replace=False,
+            size=int(test_raw.shape[0] * sample_size),
+        ).astype(int)  # Ensuring integers
+
+        train_raw = train_raw[train_idxs,:]
+        test_raw = test_raw[test_idxs,:]
+    
+    cleaned_train = process_notes(train_raw, max_length)
+    cleaned_test = process_notes(test_raw, max_length)
+    
+    write_to_file(cleaned_train, 'train', out_dir)
+    write_to_file(cleaned_test, 'test', out_dir)

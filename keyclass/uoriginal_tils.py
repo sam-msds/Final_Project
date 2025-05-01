@@ -78,37 +78,33 @@ def log(metrics: Union[List, Dict], filename: str, results_dir: str,
 def compute_metrics(y_preds: np.array,
                     y_true: np.array,
                     average: str = 'weighted'):
-    """Compute accuracy, precision, and recall.
+    """Compute accuracy, recall and precision
 
         Parameters
         ----------
         y_preds: np.array
-            Predictions (could be class probabilities or class labels)
+            Predictions
         
         y_true: np.array
-            Ground truth labels (could be class labels or multi-hot encoded)
+            Ground truth labels
         
         average: str
-            Averaging method for multiclass/multilabel classification.
-            Options: 'micro', 'macro', 'weighted', 'samples', or None.
+            This parameter is required for multiclass/multilabel targets. If None, 
+            the scores for each class are returned. Otherwise, this determines the 
+            type of averaging performed on the data.
     """
     
-    # If y_preds is a 2D array (probabilities/logits), convert it to class labels
-    if len(y_preds.shape) == 2:
-        y_preds = np.argmax(y_preds, axis=1)
-    
-    # If y_true is multi-hot encoded (2D), convert it to class labels
-    if len(y_true.shape) == 2:
-        y_true = np.argmax(y_true, axis=1)
 
-    # Compute accuracy
-    accuracy = np.mean(y_preds == y_true)
 
-    # Compute precision and recall
-    precision = precision_score(y_true, y_preds, average=average)
-    recall = recall_score(y_true, y_preds, average=average)
+    return [
+        #np.mean(y_preds == y_true),
+        
+        np.mean(np.argmax(y_preds, axis=1) == y_true),
 
-    return accuracy, precision, recall
+        precision_score(y_true, y_preds, average=average),
+        recall_score(y_true, y_preds, average=average)
+    ]
+
 
 def compute_metrics_bootstrap(y_preds: np.array,
                               y_true: np.array,

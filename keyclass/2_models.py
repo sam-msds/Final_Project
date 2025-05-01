@@ -91,7 +91,7 @@ class CustomEncoder(torch.nn.Module):
 
     def encode(self,
                sentences: Union[str, List[str]],
-               batch_size: int = 32,
+               batch_size: int = 4,
                show_progress_bar: Optional[bool] = False,
                normalize_embeddings: bool = False):
         """
@@ -113,28 +113,27 @@ class CustomEncoder(torch.nn.Module):
         return embeddings
 
     def forward(self,
-                sentences: Union[str, List[str]],
-                batch_size: int = 32,
-                show_progress_bar: Optional[bool] = None,
-                normalize_embeddings: bool = False):
+            sentences: Union[str, List[str]],
+            batch_size: int = 4,
+            show_progress_bar: Optional[bool] = None,
+            normalize_embeddings: bool = False):
         """
         Computes sentence embeddings
 
-        
         Parameters
-        ---------- 
+        ----------
         sentences: the sentences to embed
         batch_size: the batch size used for the computation
         show_progress_bar: This option is not used, and primarily present due to compatibility. 
-        normalize_embeddings: This option is not used, and primarily present due to compatibility. 
+        normalize_embeddings: Whether to normalize the embeddings
         """
+
+        if isinstance(sentences, str):
+            sentences = [sentences]
 
         all_embeddings = []
 
-        length_sorted_idx = np.argsort(
-            [-utils._text_length(sen) for sen in sentences])
-        # length_sorted_idx = np.argsort([-self.model._text_length(sen) for sen in sentences])
-
+        length_sorted_idx = np.argsort([-utils._text_length(sen) for sen in sentences])
         sentences_sorted = [sentences[idx] for idx in length_sorted_idx]
 
         for start_index in trange(0,
@@ -142,9 +141,7 @@ class CustomEncoder(torch.nn.Module):
                                   batch_size,
                                   desc="Batches",
                                   disable=not show_progress_bar):
-            # for start_index in range(0, len(sentences), batch_size):
-            sentences_batch = sentences_sorted[start_index:start_index +
-                                               batch_size]
+            sentences_batch = sentences_sorted[start_index:start_index + batch_size]
 
             features = self.tokenizer(sentences_batch,
                                       return_tensors='pt',
@@ -153,22 +150,18 @@ class CustomEncoder(torch.nn.Module):
                                       padding=True)
             features = features.to(self.device)
             out_features = self.model.forward(**features)
-            embeddings = utils.mean_pooling(out_features,
-                                            features['attention_mask'])
+            embeddings = utils.mean_pooling(out_features, features['attention_mask'])
 
             if normalize_embeddings:
-                embeddings = torch.nn.functional.normalize(embeddings,
-                                                           p=2,
-                                                           dim=1)
+                embeddings = torch.nn.functional.normalize(embeddings, p=2, dim=1)
 
-            all_embeddings.extend(embeddings)
+            all_embeddings.append(embeddings)
 
-        all_embeddings = [
-            all_embeddings[idx] for idx in np.argsort(length_sorted_idx)
-        ]
-        all_embeddings = torch.stack(all_embeddings)  # Converts to tensor
+        # Reorder to original input order
+        reordered_embeddings = torch.cat([all_embeddings[idx] for idx in np.argsort(length_sorted_idx)], dim=0)
 
-        return all_embeddings
+        return reordered_embeddings
+
 
 
 class Encoder(torch.nn.Module):
@@ -197,7 +190,7 @@ class Encoder(torch.nn.Module):
 
     def encode(self,
                sentences: Union[str, List[str]],
-               batch_size: int = 32,
+               batch_size: int = 4,
                show_progress_bar: Optional[bool] = False,
                normalize_embeddings: bool = False):
         """
@@ -221,7 +214,7 @@ class Encoder(torch.nn.Module):
 
     def forward(self,
                 sentences: Union[str, List[str]],
-                batch_size: int = 32,
+                batch_size: int = 4,
                 show_progress_bar: Optional[bool] = False,
                 normalize_embeddings: bool = False):
         """
@@ -323,14 +316,14 @@ class FeedForwardFlexible(torch.nn.Module):
 
         return x
 
-    def predict(self, x_test, batch_size=128, raw_text=True):
+    def predict(self, x_test, batch_size=4, raw_text=True):
         preds = self.predict_proba(x_test,
                                    batch_size=batch_size,
                                    raw_text=raw_text)
         preds = np.argmax(preds, axis=1)
         return preds
 
-    def predict_proba(self, x_test, batch_size=128, raw_text=True):
+    def predict_proba(self, x_test, batch_size=4, raw_text=True):
         with torch.no_grad():
             self.eval()
             probs_list = []
@@ -367,7 +360,7 @@ class LabelModelWrapper:
     def __init__(self,
                  label_matrix,
                  y_train=None,
-                 n_classes=2,
+                 n_classes=20,
                  device='cuda',
                  model_name='data_programming'):
         if not isinstance(label_matrix, pd.DataFrame):
@@ -381,7 +374,7 @@ class LabelModelWrapper:
 
         self.label_matrix = label_matrix.to_numpy()
         self.y_train = y_train
-        self.n_classes = n_classes
+        self.n_classes = 19
         self.LF_names = list(label_matrix.columns)
         self.learned_weights = None  # learned weights of the labeling functions
         self.trained = False  # The label model is not trained yet
@@ -421,6 +414,12 @@ class LabelModelWrapper:
             seed: int
                 A random seed to initialize the random number generator with
         """
+        valid_labels = self.label_matrix[self.label_matrix != -1]
+        if valid_labels.size == 0:
+            raise ValueError("Label matrix contains only abstain values (-1). Cannot determine number of classes.")
+            self.n_classes = int(valid_labels.max()) + 1
+
+
         print(f'==== Training the label model ====')
         if self.model_name == 'data_programming':
             self.label_model = LabelModel(cardinality=self.n_classes,

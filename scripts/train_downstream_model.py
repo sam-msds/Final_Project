@@ -68,7 +68,8 @@ def load_data(args):
                 join(args['data_path'], args['dataset'], f'train_labels.txt'),
                 'r') as f:
             y_train = f.readlines()
-        y_train = np.array([int(i.replace('\n', '')) for i in y_train])
+        #susovan y_train = np.array([int(i.replace('\n', '')) for i in y_train])
+        y_train = np.array([list(map(int, i.replace('\n', '').split(', '))) for i in y_train])
         training_labels_present = True
     else:
         y_train = None
@@ -77,7 +78,8 @@ def load_data(args):
     with open(join(args['data_path'], args['dataset'], f'test_labels.txt'),
               'r') as f:
         y_test = f.readlines()
-    y_test = np.array([int(i.replace('\n', '')) for i in y_test])
+    #susovan y_test = np.array([int(i.replace('\n', '')) for i in y_test])
+    y_test = np.array([list(map(int, i.replace('\n', '').split(', '))) for i in y_test])
 
     # Print data statistics
     print('\n==== Data statistics ====')
