@@ -257,6 +257,11 @@ class Encoder(torch.nn.Module):
                                   disable=not show_progress_bar):
             sentences_batch = sentences_sorted[start_index:start_index +
                                                batch_size]
+            #Susovan
+            if isinstance(sentences_batch[0], list):
+                # Flatten list of lists
+                sentences_batch = [s[0] for s in sentences_batch]
+                
             features = self.model.tokenize(sentences_batch)
             features = sentence_transformers.util.batch_to_device(
                 features, self.device)

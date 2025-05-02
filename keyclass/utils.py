@@ -105,8 +105,8 @@ def compute_metrics(y_preds: np.array,
     accuracy = np.mean(y_preds == y_true)
 
     # Compute precision and recall
-    precision = precision_score(y_true, y_preds, average=average)
-    recall = recall_score(y_true, y_preds, average=average)
+    precision = precision_score(y_true, y_preds, average=average,zero_division=0)
+    recall = recall_score(y_true, y_preds, average=average,zero_division=0)
 
     return accuracy, precision, recall
 

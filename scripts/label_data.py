@@ -137,7 +137,7 @@ def run(args_cmd):
         utils.log(metrics=training_metrics_with_gt,
                   filename='label_model_with_ground_truth',
                   results_dir=args['results_path'],
-                  split='train',
+                  split='train'
                   #susovan class_being_tested=str(args['n_class_being_tested'])
                   )
 
