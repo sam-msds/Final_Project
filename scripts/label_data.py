@@ -129,7 +129,8 @@ def run(args_cmd):
           np.unique(y_train_pred, return_counts=True))
     if training_labels_present:
         print('Label Model Training Accuracy',
-              np.mean(np.argmax(y_train_pred, axis=1) == y_train))
+              #susovannp.mean(np.argmax(y_train_pred, axis=1) == y_train)
+              np.mean(np.argmax(y_train_pred, axis=1) == np.argmax(y_train, axis=1)))
 
         # Log the metrics
         training_metrics_with_gt = utils.compute_metrics(
