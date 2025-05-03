@@ -100,6 +100,10 @@ def compute_metrics(y_preds: np.array,
     # If y_true is multi-hot encoded (2D), convert it to class labels
     if len(y_true.shape) == 2:
         y_true = np.argmax(y_true, axis=1)
+    
+    min_len = min(len(y_preds), len(y_true))
+    y_preds = y_preds[:min_len]
+    y_true = y_true[:min_len]
 
     # Compute accuracy
     accuracy = np.mean(y_preds == y_true)

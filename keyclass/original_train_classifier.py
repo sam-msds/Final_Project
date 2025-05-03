@@ -1,3 +1,25 @@
+# coding=utf-8
+# MIT License
+
+# Copyright (c) 2020 Carnegie Mellon University, Auton Lab
+
+# Permission is hereby granted, free of charge, to any person obtaining a copy
+# of this software and associated documentation files (the "Software"), to deal
+# in the Software without restriction, including without limitation the rights
+# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+# copies of the Software, and to permit persons to whom the Software is
+# furnished to do so, subject to the following conditions:
+
+# The above copyright notice and this permission notice shall be included in all
+# copies or substantial portions of the Software.
+
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+# SOFTWARE.
 
 from curses import raw
 import torch
@@ -32,7 +54,7 @@ def train(model: torch.nn.Module,
           device: torch.device = torch.device("cuda"),
           sample_weights: Optional[np.array] = None,
           epochs: int = 200,
-          batch_size: int = 128,
+          batch_size: int = 4,
           criterion: Callable = torch.nn.CrossEntropyLoss(reduction='none'),
           raw_text: bool = False,
           lr: float = 1e-3,
@@ -94,7 +116,7 @@ def train(model: torch.nn.Module,
             if raw_text == False: batch_x = batch_x.to(device)
 
             out = model.forward(batch_x, mode='inference', raw_text=raw_text)
-            loss = criterion(out.float(), batch_y.float())
+            loss = criterion(out, batch_y)
 
             if sample_weights is not None:
                 batch_weight = sample_weights[indices]
@@ -137,7 +159,7 @@ def self_train(model: torch.nn.Module,
                device: torch.device = torch.device("cuda"),
                lr: float = 1e-5,
                weight_decay: float = 1e-4,
-               batch_size: int = 32,
+               batch_size: int = 4,
                q_update_interval: int = 50,
                patience: int = 3,
                self_train_thresh: float = 1 - 2e-3,
@@ -188,17 +210,16 @@ def self_train(model: torch.nn.Module,
                                              raw_text=True)
             target_dist = get_q_soft(
                 pred_proba)  # should be of size (N, num_categories)
-            # target_preds = np.argmax(target_dist, axis=1)
-            target_preds = target_dist
+            target_preds = np.argmax(target_dist, axis=1)
 
-            # self_train_agreement = np.mean(
-            #     np.argmax(pred_proba, axis=1) == target_preds)
+            self_train_agreement = np.mean(
+                np.argmax(pred_proba, axis=1) == target_preds)
 
-            # if self_train_agreement > self_train_thresh: tolcount += 1
-            # else: tolcount = 0
+            if self_train_agreement > self_train_thresh: tolcount += 1
+            else: tolcount = 0
 
-            # if tolcount >= patience:
-            #     break
+            if tolcount >= patience:
+                break
 
         for i in range(0, batch_size * q_update_interval, batch_size):
             batch_x = X_train[inds][
@@ -221,7 +242,7 @@ def self_train(model: torch.nn.Module,
             # print('tolcount', tolcount, 'self_train_agreement', self_train_agreement, 'validation_accuracy', np.mean(val_preds==y_val))
 
         pbar.set_postfix(tolerance_count=tolcount,
-                         # self_train_agreement=self_train_agreement,
+                         self_train_agreement=self_train_agreement,
                          validation_accuracy=np.mean(
                              val_preds == y_val) if print_eval else None)
     return model

@@ -1,4 +1,28 @@
+# coding=utf-8
+# MIT License
+
+# Copyright (c) 2020 Carnegie Mellon University, Auton Lab
+
+# Permission is hereby granted, free of charge, to any person obtaining a copy
+# of this software and associated documentation files (the "Software"), to deal
+# in the Software without restriction, including without limitation the rights
+# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+# copies of the Software, and to permit persons to whom the Software is
+# furnished to do so, subject to the following conditions:
+
+# The above copyright notice and this permission notice shall be included in all
+# copies or substantial portions of the Software.
+
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+# SOFTWARE.
+
 import sys
+
 sys.path.append('../keyclass/')
 
 import argparse
@@ -9,7 +33,6 @@ from os.path import join, exists
 import models
 import utils
 import train_classifier
-import label_data
 import pickle
 from datetime import datetime
 
@@ -19,8 +42,7 @@ def load_data(args):
             join(args['preds_path'], f"{args['label_model']}_proba_preds.pkl"),
             'rb') as f:
         proba_preds = pickle.load(f)
-    # y_train_lm = np.argmax(proba_preds, axis=1)
-    y_train_lm = proba_preds
+    y_train_lm = np.argmax(proba_preds, axis=1)
     sample_weights = np.max(proba_preds,
                             axis=1)  # Sample weights for noise aware loss
 
@@ -45,22 +67,19 @@ def load_data(args):
         with open(
                 join(args['data_path'], args['dataset'], f'train_labels.txt'),
                 'r') as f:
-            y_train = f.readlines()[:args['size_of_dataset']]
-        # y_train = np.array([int(i.replace('\n', '')) for i in y_train])
-        y_train = label_data.label_converter(args, y_train)
+            y_train = f.readlines()
+        #susovan y_train = np.array([int(i.replace('\n', '')) for i in y_train])
+        y_train = np.array([list(map(int, i.replace('\n', '').split(', '))) for i in y_train])
         training_labels_present = True
-        # print("Here")
     else:
         y_train = None
         print('No training labels found!')
 
     with open(join(args['data_path'], args['dataset'], f'test_labels.txt'),
               'r') as f:
-        y_test = f.readlines()[:args['size_of_dataset']]
-    # y_test = np.array([int(i.replace('\n', '')) for i in y_test])
-    # print("YTEST = ",y_test)
-    y_test = label_data.label_converter(args, y_test)
-    # print("YTEST = ", y_test)
+        y_test = f.readlines()
+    #susovan y_test = np.array([int(i.replace('\n', '')) for i in y_test])
+    y_test = np.array([list(map(int, i.replace('\n', '').split(', '))) for i in y_test])
 
     # Print data statistics
     print('\n==== Data statistics ====')
@@ -82,9 +101,10 @@ def load_data(args):
     )
     print('\n==== Data statistics (after applying mask) ====')
 
-    y_train_lm = y_train.reshape(y_train_lm.shape)
     if training_labels_present:
-        y_train_masked = y_train[mask]
+        #susovan test y_train_masked = y_train[mask]
+        min_len = min(len(y_train), len(mask))
+        y_train_masked = y_train[:min_len][mask[:min_len]]
     y_train_lm_masked = y_train_lm[mask]
     X_train_embed_masked = X_train_embed[mask]
     sample_weights_masked = sample_weights[mask]
@@ -100,9 +120,6 @@ def load_data(args):
         f'Training class distribution (label model predictions): {np.unique(y_train_lm_masked, return_counts=True)[1]/len(y_train_lm_masked)}'
     )
 
-
-    # print(y_train, y_train.shape)
-    # print("ytrainlm", y_train_lm, y_train_lm.shape)
     return X_train_embed_masked, y_train_lm_masked, y_train_masked, \
      X_test_embed, y_test, \
      training_labels_present, sample_weights_masked, proba_preds_masked
@@ -131,7 +148,6 @@ def train(args_cmd):
         encoder = models.Encoder(model_name=args['base_encoder'],
                                  device=args['device'])
 
-    # print("ytrain in downstream classifier",y_train_lm_masked)
     classifier = models.FeedForwardFlexible(
         encoder_model=encoder,
         h_sizes=args['h_sizes'],
@@ -161,9 +177,9 @@ def train(args_cmd):
         torch.save(model, f)
 
     end_model_preds_train = model.predict_proba(
-        torch.from_numpy(X_train_embed_masked), batch_size=512, raw_text=False)
+        torch.from_numpy(X_train_embed_masked), batch_size=4, raw_text=False)
     end_model_preds_test = model.predict_proba(torch.from_numpy(X_test_embed),
-                                               batch_size=512,
+                                               batch_size=4,
                                                raw_text=False)
 
     # Save the predictions
@@ -176,35 +192,25 @@ def train(args_cmd):
     # Print statistics
     if training_labels_present:
         training_metrics_with_gt = utils.compute_metrics(
-            # y_preds=np.argmax(end_model_preds_train, axis=1),
-            y_preds=end_model_preds_train,
+            y_preds=np.argmax(end_model_preds_train, axis=1),
             y_true=y_train_masked,
             average=args['average'])
         utils.log(metrics=training_metrics_with_gt,
                   filename='end_model_with_ground_truth',
                   results_dir=args['results_path'],
-                  split='train'
-                  #,
-                  #class_being_tested=str(args['n_class_being_tested'])
-                  )
+                  split='train')
 
-        # print(end_model_preds_train)
-        # print("ytrain lm masked",y_train_lm_masked)
-
-    # training_metrics_with_lm = utils.compute_metrics(
-    #     # y_preds=np.argmax(end_model_preds_train, axis=1),
-    #     y_preds=end_model_preds_train,
-    #                                                  y_true=y_train_lm_masked,
-    #                                                  average=args['average'])
-    # utils.log(metrics=training_metrics_with_lm,
-    #           filename='end_model_with_label_model',
-    #           results_dir=args['results_path'],
-    #           split='train',
-    #           class_being_tested=str(args['n_class_being_tested']))
+    training_metrics_with_lm = utils.compute_metrics(y_preds=np.argmax(
+        end_model_preds_train, axis=1),
+                                                     y_true=y_train_lm_masked,
+                                                     average=args['average'])
+    utils.log(metrics=training_metrics_with_lm,
+              filename='end_model_with_label_model',
+              results_dir=args['results_path'],
+              split='train')
 
     testing_metrics = utils.compute_metrics_bootstrap(
-        # y_preds=np.argmax(end_model_preds_test, axis=1),
-        y_preds=end_model_preds_test,
+        y_preds=np.argmax(end_model_preds_test, axis=1),
         y_true=y_test,
         average=args['average'],
         n_bootstrap=args['n_bootstrap'],
@@ -212,20 +218,17 @@ def train(args_cmd):
     utils.log(metrics=testing_metrics,
               filename='end_model_with_ground_truth',
               results_dir=args['results_path'],
-              split='test'
-              #,
-              #class_being_tested=str(args['n_class_being_tested'])
-              )
+              split='test')
 
     print('\n===== Self-training the downstream classifier =====\n')
 
     # Fetching the raw text data for self-training
     X_train_text = utils.fetch_data(dataset=args['dataset'],
                                     path=args['data_path'],
-                                    split='train')[:args['size_of_dataset']]
+                                    split='train')
     X_test_text = utils.fetch_data(dataset=args['dataset'],
                                    path=args['data_path'],
-                                   split='test')[:args['size_of_dataset']]
+                                   split='test')
 
     model = train_classifier.self_train(
         model=model,
@@ -258,8 +261,7 @@ def train(args_cmd):
 
     # Print statistics
     testing_metrics = utils.compute_metrics_bootstrap(
-        # y_preds=np.argmax(end_model_preds_test, axis=1),
-        y_preds=end_model_preds_test,
+        y_preds=np.argmax(end_model_preds_test, axis=1),
         y_true=y_test,
         average=args['average'],
         n_bootstrap=args['n_bootstrap'],
@@ -267,10 +269,7 @@ def train(args_cmd):
     utils.log(metrics=testing_metrics,
               filename='end_model_with_ground_truth_self_trained',
               results_dir=args['results_path'],
-              split='test'
-              #,
-              #class_being_tested=str(args['n_class_being_tested'])
-              )
+              split='test')
     return testing_metrics
 
 
@@ -290,30 +289,27 @@ def test(args_cmd, end_model_path, end_model_self_trained_path):
     model = torch.load(end_model_path)
 
     end_model_preds_train = model.predict_proba(
-        torch.from_numpy(X_train_embed_masked), batch_size=512, raw_text=False)
+        torch.from_numpy(X_train_embed_masked), batch_size=4, raw_text=False)
     end_model_preds_test = model.predict_proba(torch.from_numpy(X_test_embed),
-                                               batch_size=512,
+                                               batch_size=4,
                                                raw_text=False)
 
     # Print statistics
     if training_labels_present:
         training_metrics_with_gt = utils.compute_metrics(
-            # y_preds=np.argmax(end_model_preds_train, axis=1),
-            y_preds=end_model_preds_train,
+            y_preds=np.argmax(end_model_preds_train, axis=1),
             y_true=y_train_masked,
             average=args['average'])
         print('training_metrics_with_gt', training_metrics_with_gt)
 
-    # training_metrics_with_lm = utils.compute_metrics(
-    #     # y_preds=np.argmax(end_model_preds_train, axis=1),
-    #     y_preds=end_model_preds_train,
-    #                                                  y_true=y_train_lm_masked,
-    #                                                  average=args['average'])
-    # print('training_metrics_with_lm', training_metrics_with_lm)
+    training_metrics_with_lm = utils.compute_metrics(y_preds=np.argmax(
+        end_model_preds_train, axis=1),
+                                                     y_true=y_train_lm_masked,
+                                                     average=args['average'])
+    print('training_metrics_with_lm', training_metrics_with_lm)
 
     testing_metrics = utils.compute_metrics_bootstrap(
-        # y_preds=np.argmax(end_model_preds_test, axis=1),
-        y_preds=end_model_preds_test,
+        y_preds=np.argmax(end_model_preds_test, axis=1),
         y_true=y_test,
         average=args['average'],
         n_bootstrap=args['n_bootstrap'],
@@ -325,10 +321,10 @@ def test(args_cmd, end_model_path, end_model_self_trained_path):
     # Fetching the raw text data for self-training
     X_train_text = utils.fetch_data(dataset=args['dataset'],
                                     path=args['data_path'],
-                                    split='train')[:args['size_of_dataset']]
+                                    split='train')
     X_test_text = utils.fetch_data(dataset=args['dataset'],
                                    path=args['data_path'],
-                                   split='test')[:args['size_of_dataset']]
+                                   split='test')
 
     model = torch.load(end_model_self_trained_path)
 
@@ -337,8 +333,7 @@ def test(args_cmd, end_model_path, end_model_self_trained_path):
 
     # Print statistics
     testing_metrics = utils.compute_metrics_bootstrap(
-        # y_preds=np.argmax(end_model_preds_test, axis=1),
-        y_preds=end_model_preds_test,
+        y_preds=np.argmax(end_model_preds_test, axis=1),
         y_true=y_test,
         average=args['average'],
         n_bootstrap=args['n_bootstrap'],

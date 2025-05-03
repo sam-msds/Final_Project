@@ -1,26 +1,3 @@
-# coding=utf-8
-# MIT License
-
-# Copyright (c) 2020 Carnegie Mellon University, Auton Lab
-
-# Permission is hereby granted, free of charge, to any person obtaining a copy
-# of this software and associated documentation files (the "Software"), to deal
-# in the Software without restriction, including without limitation the rights
-# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-# copies of the Software, and to permit persons to whom the Software is
-# furnished to do so, subject to the following conditions:
-
-# The above copyright notice and this permission notice shall be included in all
-# copies or substantial portions of the Software.
-
-# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-# SOFTWARE.
-
 import sys
 
 sys.path.append('..')
@@ -35,20 +12,27 @@ import torch
 import os
 from os.path import join, exists
 
-def label_converter(args, inp):
+#def label_converter(args, inp):
     # print("Inside Label Converter")
     # print("Arg",args['n_class_being_tested'])
-    return_val = []
-    for line in inp:
-        row = []
-        for c in line:
-            if c=='0' or c=='1':
-                row.append(int(c))
+#    return_val = []
+#    for line in inp:
+#        row = []
+#        for c in line:
+#            if c=='0' or c=='1':
+#                row.append(int(c))
         # return_val.append(row)
         # print(row, row[args['n_class_being_tested']])
+#        return_val.append(row[args['n_class_being_tested']])
+#    return np.array(return_val)
+
+def label_converter(args, inp):
+    return_val = []
+    for line in inp:
+        # Properly split on commas and remove whitespace
+        row = [int(x.strip()) for x in line.strip().split(',')]
         return_val.append(row[args['n_class_being_tested']])
     return np.array(return_val)
-
 
 def run(args_cmd):
 
@@ -129,8 +113,7 @@ def run(args_cmd):
           np.unique(y_train_pred, return_counts=True))
     if training_labels_present:
         print('Label Model Training Accuracy',
-              #susovannp.mean(np.argmax(y_train_pred, axis=1) == y_train)
-              np.mean(np.argmax(y_train_pred, axis=1) == np.argmax(y_train, axis=1)))
+              np.mean(y_train_pred == y_train))
 
         # Log the metrics
         training_metrics_with_gt = utils.compute_metrics(
@@ -139,7 +122,8 @@ def run(args_cmd):
                   filename='label_model_with_ground_truth',
                   results_dir=args['results_path'],
                   split='train'
-                  #susovan class_being_tested=str(args['n_class_being_tested'])
+                  #,
+                  #n_class_being_tested=str(args['n_class_being_tested'])
                   )
 
 
