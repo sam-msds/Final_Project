@@ -3,14 +3,14 @@ BASE_PATH="/content/drive/MyDrive/CS598DLH_KeyClass_Reproduce/"
 cd -- "$BASE_PATH"
 git clone https://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@github.com/sam-msds/CS598DLH_Project.git
 cd CS598DLH_Project
-mv One-Versus-Not KeyClass
+#mv One-Versus-Not KeyClass
 mv scripts keyclass
 pip install snorkel sentence-transformers transformers
 cd keyclass/scripts/
 
 mkdir data/
 cd data/
-FILE_ID="1PjNgB6jLFZgViw2Z67DRKbTBq7_V-at3" #Full MIMIC DATASET
+FILE_ID="1idGFVRc5tfi_LyGihjQBnxB_9t4G0DlD" #Full MIMIC DATASET
 #FILE_ID="1DaXCjzs8I4PCpzaldaDNIublK4MedD-_" #10 MIMIC DATASET
 URL="https://docs.google.com/uc?export=download&id=$FILE_ID"
 echo ${green}===Downloading MIMIC Data...===${reset}
