@@ -1,5 +1,3 @@
-pip install pyhealth
-
 import json
 from os.path import join, exists
 import re
@@ -13,6 +11,11 @@ from yaml import load, dump
 from yaml import CLoader as Loader, CDumper as Dumper
 # import cleantext
 from pyhealth.metrics import multilabel_metrics_fn
+import subprocess
+import sys
+
+def install(package):
+    subprocess.check_call([sys.executable, "-m", "pip", "install", package])
 
 
 def log(metrics: Union[List, Dict], filename: str, results_dir: str,
@@ -58,6 +61,7 @@ def log(metrics: Union[List, Dict], filename: str, results_dir: str,
 def compute_metrics(y_preds: np.array,
                     y_true: np.array,
                     average: str = 'weighted'):
+    install('pyhealth')                
     metrics = multilabel_metrics_fn(y_preds, y_true, metrics=["accuracy","precision_weighted","recall_weighted","f1_weighted"])
     return [
         metrics["accuracy"],
