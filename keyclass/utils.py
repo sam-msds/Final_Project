@@ -10,7 +10,6 @@ import torch
 from yaml import load, dump
 from yaml import CLoader as Loader, CDumper as Dumper
 # import cleantext
-from pyhealth.metrics import multilabel_metrics_fn
 import subprocess
 import sys
 
@@ -61,7 +60,8 @@ def log(metrics: Union[List, Dict], filename: str, results_dir: str,
 def compute_metrics(y_preds: np.array,
                     y_true: np.array,
                     average: str = 'weighted'):
-    install('pyhealth')                
+    install('pyhealth')     
+    from pyhealth.metrics import multilabel_metrics_fn           
     metrics = multilabel_metrics_fn(y_preds, y_true, metrics=["accuracy","precision_weighted","recall_weighted","f1_weighted"])
     return [
         metrics["accuracy"],
