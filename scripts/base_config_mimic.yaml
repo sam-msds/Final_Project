@@ -35,11 +35,11 @@ self_train_patience: 8
 self_train_thresh: 1-2e-3
 self_train_weight_decay: 1e-4
 show_progress_bar: true
-#target_00: infections, parasitic & also infect, appear infect, bacteri infect, bacteria patient, chronic infect, concern infect, concern infecti, concern wound infect, develop infect, discuss infecti, due infecti, experi fever, experi follow fever, fever infect, fever infecti, followup infecti, found infect, fungal infect, fungal rash, infect appear, infect chronic, infect clinic, infect concern, infect due pneumophila, infect fever, infect patient, infect present, infect skin, infect wound, infect wound site, infecti, infectionsepsi, like infect, like infecti, may infecti, medic infect, pathogen, patient infect, periorbit ecchymosi, seen infecti, skin infect, suggest infecti, tender drainag fever, tract infect, tract infect also, tract infect pleas, treat antibiot infect, viral infect, well infecti, wound infect
-#target_01: neoplasms
-#target_02: endocrine, nutritional, metabolic
-#target_03: blood, blood-forming organs
-#target_04: mental disorders
+target_00: infections, parasitic #, parasitic & also infect, appear infect, bacteri infect, bacteria patient, chronic infect, concern infect, concern infecti, concern wound infect, develop infect, discuss infecti, due infecti, experi fever, experi follow fever, fever infect, fever infecti, followup infecti, found infect, fungal infect, fungal rash, infect appear, infect chronic, infect clinic, infect concern, infect due pneumophila, infect fever, infect patient, infect present, infect skin, infect wound, infect wound site, infecti, infectionsepsi, like infect, like infecti, may infecti, medic infect, pathogen, patient infect, periorbit ecchymosi, seen infecti, skin infect, suggest infecti, tender drainag fever, tract infect, tract infect also, tract infect pleas, treat antibiot infect, viral infect, well infecti, wound infect
+target_01: neoplasms
+target_02: endocrine, nutritional, metabolic
+target_03: blood, blood-forming organs
+target_04: mental disorders
 #target_05: nervous system
 #target_06: sense organs
 #target_07: circulatory system
@@ -54,8 +54,8 @@ show_progress_bar: true
 #target_16: injury and poisoning
 #target_17: external causes of injury
 #target_18: supplementary
-target_00: tuberculosis,  found,  unspecified,  bacilli,  tubercle,  bacteriological,  examination,  histological,  specified,  sputum,  confirmed,  microscopy,  infection,  tuberculous,  due,  bacterial,  done,  unknown,  present,  animals,  inoculation,  culture,  histologically,  methods,  acute
-target_01: neoplasm,  malignant,  unspecified,  lymph,  nodes,  benign,  sites,  cell,  limb,  site,  hodgkins,  lymphoma,  skin,  carcinoma,  specified,  leukemia,  disease,  tumor,  remission,  lower,  upper,  carcinoid,  face,  situ,  neck
+#target_00: tuberculosis,  found,  unspecified,  bacilli,  tubercle,  bacteriological,  examination,  histological,  specified,  sputum,  confirmed,  microscopy,  infection,  tuberculous,  due,  bacterial,  done,  unknown,  present,  animals,  inoculation,  culture,  histologically,  methods,  acute
+#target_01: neoplasm,  malignant,  unspecified,  lymph,  nodes,  benign,  sites,  cell,  limb,  site,  hodgkins,  lymphoma,  skin,  carcinoma,  specified,  leukemia,  disease,  tumor,  remission,  lower,  upper,  carcinoid,  face,  situ,  neck
 #target_10: unspecified,  specified,  chronic,  lesion,  female,  kidney,  acute,  glomerulonephritis,  disorders,  genital,  urinary,  cervix,  prostate,  classified,  breast,  disorder,  urethral,  renal,  elsewhere,  diseases,  tract,  disease,  bladder,  vulva,  organs
 #target_11: condition,  complication,  unspecified,  antepartum,  mention,  delivered,  without,  care,  episode,  applicable,  postpartum,  pregnancy,  mother,  abortion,  labor,  complicating,  childbirth,  puerperium,  delivery,  complicated,  complications,  associated,  induced,  fetal,  specified
 ##target_12: due,  unspecified,  dermatitis,  ulcer,  specified,  abscess,  pressure,  cellulitis,  skin,  contact,  erythematous,  condition,  body,  surface,  percent,  involving,  carbuncle,  eczema,  exfoliation,  furuncle,  urticaria,  conditions,  hair,  erythema,  tissue
@@ -63,14 +63,14 @@ target_01: neoplasm,  malignant,  unspecified,  lymph,  nodes,  benign,  sites, 
 #target_14: congenital,  anomalies,  unspecified,  specified,  anomaly,  cleft,  complete,  deficiency,  incomplete,  longitudinal,  without,  limb,  system,  partial,  syndrome,  lip,  stenosis,  atresia,  palate,  pulmonary,  ear,  spina,  hydrocephalus,  deformities,  region
 #target_15: newborn,  fetus,  grams,  fetal,  affecting,  unspecified,  malnutrition,  lightfordates,  without,  due,  mention,  neonatal,  respiratory,  hemorrhage,  maternal,  birth,  perinatal,  placenta,  gestation,  infants,  preterm,  signs,  milk,  breast,  aspiration
 #target_16: open,  fracture,  unspecified,  wound,  consciousness,  closed,  intracranial,  loss,  without,  injury,  skull,  mention,  hemorrhage,  hours,  level,  laceration,  prolonged,  conscious,  return,  dislocation,  preexisting,  contusion,  cerebral,  cavity,  bones
-target_02: type,  unspecified,  diabetes,  uncontrolled,  disorders,  deficiency,  manifestations,  stated,  metabolism,  mention,  specified,  mellitus,  secondary,  ii,  juvenile,  without,  goiter,  vitamin,  disorder,  storm,  crisis,  thyrotoxic,  syndrome,  complication,  toxic
-target_03: anemia,  unspecified,  disease,  deficiency,  specified,  thalassemia,  anemias,  crisis,  blood,  hemolytic,  sicklecell,  neutropenia,  congenital,  due,  iron,  secondary,  chronic,  hereditary,  thrombocytopenia,  without,  hemorrhagic,  disorder,  purpura,  white,  factor
-target_04: disorder,  unspecified,  type,  episode,  remission,  dependence,  schizophrenia,  abuse,  specified,  bipolar,  drug,  acute,  disorders,  current,  chronic,  psychotic,  episodic,  manic,  affective,  recent,  depressive,  continuous,  conduct,  subchronic,  personality
-target_05: migraine,  without,  unspecified,  intractable,  mention,  status,  migrainosus,  elsewhere,  classified,  epilepsy,  sleep,  cerebral,  stated,  diseases,  nerve,  disorder,  aura,  headache,  meningitis,  syndrome,  due,  affecting,  disorders,  side,  chronic
-target_06: unspecified,  eye,  vision,  impairment,  disorders,  retinal,  corneal,  glaucoma,  acute,  associated,  loss,  ear,  chronic,  otitis,  eyelid,  cataract,  disorder,  body,  visual,  optic,  hearing,  media,  better,  specified,  lesser
-target_07: unspecified,  disease,  heart,  chronic,  acute,  infarction,  artery,  embolism,  thrombosis,  kidney,  stage,  failure,  venous,  cerebrovascular,  without,  episode,  care,  effects,  cerebral,  late,  myocardial,  hypertensive,  atherosclerosis,  syndrome,  aneurysm
-target_08: due,  pneumonia,  acute,  unspecified,  chronic,  respiratory,  influenza,  pulmonary,  lung,  asthma,  virus,  sinusitis,  bronchitis,  larynx,  classified,  obstruction,  diseases,  elsewhere,  manifestations,  disease,  identified,  pneumonitis,  interstitial,  without,  allergic
-target_09: unspecified,  obstruction,  without,  mention,  hemorrhage,  ulcer,  chronic,  acute,  perforation,  hernia,  specified,  gangrene,  cholecystitis,  intestine,  gastric,  site,  teeth,  recurrent,  gallbladder,  dental,  jaw,  calculus,  duodenal,  anomalies,  peptic
+#target_02: type,  unspecified,  diabetes,  uncontrolled,  disorders,  deficiency,  manifestations,  stated,  metabolism,  mention,  specified,  mellitus,  secondary,  ii,  juvenile,  without,  goiter,  vitamin,  disorder,  storm,  crisis,  thyrotoxic,  syndrome,  complication,  toxic
+#target_03: anemia,  unspecified,  disease,  deficiency,  specified,  thalassemia,  anemias,  crisis,  blood,  hemolytic,  sicklecell,  neutropenia,  congenital,  due,  iron,  secondary,  chronic,  hereditary,  thrombocytopenia,  without,  hemorrhagic,  disorder,  purpura,  white,  factor
+#target_04: disorder,  unspecified,  type,  episode,  remission,  dependence,  schizophrenia,  abuse,  specified,  bipolar,  drug,  acute,  disorders,  current,  chronic,  psychotic,  episodic,  manic,  affective,  recent,  depressive,  continuous,  conduct,  subchronic,  personality
+#target_05: migraine,  without,  unspecified,  intractable,  mention,  status,  migrainosus,  elsewhere,  classified,  epilepsy,  sleep,  cerebral,  stated,  diseases,  nerve,  disorder,  aura,  headache,  meningitis,  syndrome,  due,  affecting,  disorders,  side,  chronic
+#target_06: unspecified,  eye,  vision,  impairment,  disorders,  retinal,  corneal,  glaucoma,  acute,  associated,  loss,  ear,  chronic,  otitis,  eyelid,  cataract,  disorder,  body,  visual,  optic,  hearing,  media,  better,  specified,  lesser
+#target_07: unspecified,  disease,  heart,  chronic,  acute,  infarction,  artery,  embolism,  thrombosis,  kidney,  stage,  failure,  venous,  cerebrovascular,  without,  episode,  care,  effects,  cerebral,  late,  myocardial,  hypertensive,  atherosclerosis,  syndrome,  aneurysm
+#target_08: due,  pneumonia,  acute,  unspecified,  chronic,  respiratory,  influenza,  pulmonary,  lung,  asthma,  virus,  sinusitis,  bronchitis,  larynx,  classified,  obstruction,  diseases,  elsewhere,  manifestations,  disease,  identified,  pneumonitis,  interstitial,  without,  allergic
+#target_09: unspecified,  obstruction,  without,  mention,  hemorrhage,  ulcer,  chronic,  acute,  perforation,  hernia,  specified,  gangrene,  cholecystitis,  intestine,  gastric,  site,  teeth,  recurrent,  gallbladder,  dental,  jaw,  calculus,  duodenal,  anomalies,  peptic
 
 topk: 50
 use_custom_encoder: false
