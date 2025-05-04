@@ -45,15 +45,15 @@ target_06: sense organs
 target_07: circulatory system
 target_08: respiratory system
 target_09: digestive system
-#target_10: genitourinary system
-#target_11: pregnancy, childbirth complications
-#target_12: skin, subcutaneous tissue
-#target_13: musculoskeletal system, connective tissue
-#target_14: congenital anomalies
-#target_15: perinatal period conditions
-#target_16: injury and poisoning
-#target_17: external causes of injury
-#target_18: supplementary
+target_10: genitourinary system
+target_11: pregnancy, childbirth complications
+target_12: skin, subcutaneous tissue
+target_13: musculoskeletal system, connective tissue
+target_14: congenital anomalies
+target_15: perinatal period conditions
+target_16: injury and poisoning
+target_17: external causes of injury
+target_18: supplementary
 #target_00: tuberculosis,  found,  unspecified,  bacilli,  tubercle,  bacteriological,  examination,  histological,  specified,  sputum,  confirmed,  microscopy,  infection,  tuberculous,  due,  bacterial,  done,  unknown,  present,  animals,  inoculation,  culture,  histologically,  methods,  acute
 #target_01: neoplasm,  malignant,  unspecified,  lymph,  nodes,  benign,  sites,  cell,  limb,  site,  hodgkins,  lymphoma,  skin,  carcinoma,  specified,  leukemia,  disease,  tumor,  remission,  lower,  upper,  carcinoid,  face,  situ,  neck
 #target_10: unspecified,  specified,  chronic,  lesion,  female,  kidney,  acute,  glomerulonephritis,  disorders,  genital,  urinary,  cervix,  prostate,  classified,  breast,  disorder,  urethral,  renal,  elsewhere,  diseases,  tract,  disease,  bladder,  vulva,  organs
