@@ -45,7 +45,7 @@ target_06: sense organs
 target_07: circulatory system
 target_08: respiratory system
 target_09: digestive system
-target_10: genitourinary system
+#target_10: genitourinary system
 #target_11: pregnancy, childbirth complications
 #target_12: skin, subcutaneous tissue
 #target_13: musculoskeletal system, connective tissue
