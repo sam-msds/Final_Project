@@ -1,4 +1,5 @@
-
+import sys
+sys.path.append("./PyHealth")
 
 import json
 from os.path import join, exists
@@ -13,6 +14,8 @@ from yaml import load, dump
 from yaml import CLoader as Loader, CDumper as Dumper
 # import cleantext
 from pyhealth.metrics import multilabel_metrics_fn
+
+
 
 
 def log(metrics: Union[List, Dict], filename: str, results_dir: str,
