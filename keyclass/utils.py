@@ -1,25 +1,4 @@
-# coding=utf-8
-# MIT License
-
-# Copyright (c) 2020 Carnegie Mellon University, Auton Lab
-
-# Permission is hereby granted, free of charge, to any person obtaining a copy
-# of this software and associated documentation files (the "Software"), to deal
-# in the Software without restriction, including without limitation the rights
-# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-# copies of the Software, and to permit persons to whom the Software is
-# furnished to do so, subject to the following conditions:
-
-# The above copyright notice and this permission notice shall be included in all
-# copies or substantial portions of the Software.
-
-# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-# SOFTWARE.
+pip install pyhealth
 
 import json
 from os.path import join, exists
@@ -27,17 +6,19 @@ import re
 from typing import List, Dict, Tuple, Iterable, Type, Union, Callable, Optional
 import numpy as np
 import joblib
-from sklearn.metrics import precision_score, recall_score
+from sklearn.metrics import precision_score, recall_score, precision_recall_fscore_support
 from datetime import datetime
 import torch
 from yaml import load, dump
 from yaml import CLoader as Loader, CDumper as Dumper
+# import cleantext
+from pyhealth.metrics import multilabel_metrics_fn
 
 
 def log(metrics: Union[List, Dict], filename: str, results_dir: str,
         split: str):
     """Logging function
-        
+
         Parameters
         ----------
         metrics: Union[List, Dict]
@@ -74,71 +55,42 @@ def log(metrics: Union[List, Dict], filename: str, results_dir: str,
         f.write(json.dumps(results))
 
 
-
 def compute_metrics(y_preds: np.array,
                     y_true: np.array,
                     average: str = 'weighted'):
-    """Compute accuracy, precision, and recall.
+    metrics = multilabel_metrics_fn(y_preds, y_true, metrics=["accuracy","precision_weighted","recall_weighted","f1_weighted"])
+    return [
+        metrics["accuracy"],
+        metrics["precision_weighted"],
+        metrics["recall_weighted"]
+    ]
 
-        Parameters
-        ----------
-        y_preds: np.array
-            Predictions (could be class probabilities or class labels)
-        
-        y_true: np.array
-            Ground truth labels (could be class labels or multi-hot encoded)
-        
-        average: str
-            Averaging method for multiclass/multilabel classification.
-            Options: 'micro', 'macro', 'weighted', 'samples', or None.
-    """
-    
-    # If y_preds is a 2D array (probabilities/logits), convert it to class labels
-    if len(y_preds.shape) == 2:
-        y_preds = np.argmax(y_preds, axis=1)
-    
-    # If y_true is multi-hot encoded (2D), convert it to class labels
-    if len(y_true.shape) == 2:
-        y_true = np.argmax(y_true, axis=1)
-    
-    min_len = min(len(y_preds), len(y_true))
-    y_preds = y_preds[:min_len]
-    y_true = y_true[:min_len]
-
-    # Compute accuracy
-    accuracy = np.mean(y_preds == y_true)
-
-    # Compute precision and recall
-    precision = precision_score(y_true, y_preds, average=average,zero_division=0)
-    recall = recall_score(y_true, y_preds, average=average,zero_division=0)
-
-    return accuracy, precision, recall
 
 def compute_metrics_bootstrap(y_preds: np.array,
                               y_true: np.array,
                               average: str = 'weighted',
                               n_bootstrap: int = 100,
                               n_jobs: int = 10):
-    """Compute bootstrapped confidence intervals (CIs) around metrics of interest. 
+    """Compute bootstrapped confidence intervals (CIs) around metrics of interest.
 
         Parameters
         ----------
         y_preds: np.array
             Predictions
-        
+
         y_true: np.array
             Ground truth labels
-        
+
         average: str
-            This parameter is required for multiclass/multilabel targets. If None, 
-            the scores for each class are returned. Otherwise, this determines the 
+            This parameter is required for multiclass/multilabel targets. If None,
+            the scores for each class are returned. Otherwise, this determines the
             type of averaging performed on the data.
 
         n_bootstrap: int
-            Number of boostrap samples to compute CI. 
+            Number of boostrap samples to compute CI.
 
         n_jobs: int
-            Number of jobs to run in parallel. 
+            Number of jobs to run in parallel.
     """
     output_ =  joblib.Parallel(n_jobs=n_jobs, verbose=1)(
                                 joblib.delayed(compute_metrics)
@@ -157,7 +109,7 @@ def get_balanced_data_mask(proba_preds: np.array,
     """Utility function to keep only the most confident predictions, while maintaining class balance
 
         Parameters
-        ---------- 
+        ----------
         proba_preds: Probabilistic labels of data points
         max_num: Maximum number of data points per class
         class_balance: Prevalence of each class
@@ -210,15 +162,15 @@ def fetch_data(dataset='imdb', path='~/', split='train'):
     """Fetches a dataset by its name
 
 	    Parameters
-	    ---------- 
+	    ----------
 	    dataset: str
-	        List of text to be encoded. 
+	        List of text to be encoded.
 
 	    path: str
-	        Path to the stored data. 
+	        Path to the stored data.
 
 	    split: str
-	        Whether to fetch the train or test dataset. Options are one of 'train' or 'test'. 
+	        Whether to fetch the train or test dataset. Options are one of 'train' or 'test'.
     """
     #_dataset_names = ['agnews', 'amazon', 'dbpedia', 'imdb', 'mimic']
     #if dataset not in _dataset_names:
@@ -232,8 +184,8 @@ def fetch_data(dataset='imdb', path='~/', split='train'):
 
     text = open(f'{join(path, dataset, split)}.txt').readlines()
 
-    if dataset == 'mimic':
-        text = [clean_text(line) for line in text]
+    # if dataset == 'mimic':
+    #     text = [cleantext.clean(line) for line in text]
 
     return text
 
@@ -265,10 +217,8 @@ def _text_length(text: Union[List[int], List[List[int]]]):
                                       int):  #Empty string or list of ints
         return len(text)
     else:
-        return sum([len(t) for t in text if t is not None])
-
-        #return sum([len(t)
-         #           for t in text])  #Sum of length of individual strings
+        return sum([len(t)
+                    for t in text])  #Sum of length of individual strings
 
 
 class Parser:
@@ -276,7 +226,7 @@ class Parser:
     def __init__(
             self,
             config_file_path='../config_files/default_config.yml',
-            default_config_file_path='/content/drive/MyDrive/CS598DLH_KeyClass_Reproduce/CS598DLH_Project/config_files/default_config.yml'):
+            default_config_file_path='../config_files/default_config.yml'):
         """Class to read and parse the config.yml file
 		"""
         self.config_file_path = config_file_path
