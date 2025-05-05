@@ -278,8 +278,7 @@ def _text_length(text: Union[List[int], List[List[int]]]):
                                       int):  #Empty string or list of ints
         return len(text)
     else:
-        return sum([len(t)
-                    for t in text])  #Sum of length of individual strings
+        return sum([len(t) for t in text if t is not None])  #Sum of length of individual strings
 
 
 class Parser:
