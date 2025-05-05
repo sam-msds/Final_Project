@@ -7,7 +7,7 @@ cd CS598DLH_Project
 mv scripts keyclass
 pip install snorkel sentence-transformers transformers
 cd keyclass/scripts/
-git clone https://github.com/sunlabuiuc/PyHealth.git
+
 
 
 mkdir data/
