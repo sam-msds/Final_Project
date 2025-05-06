@@ -1,3 +1,5 @@
+import sys
+sys.path.append("./PyHealth")
 
 import json
 from os.path import join, exists
@@ -5,17 +7,21 @@ import re
 from typing import List, Dict, Tuple, Iterable, Type, Union, Callable, Optional
 import numpy as np
 import joblib
-from sklearn.metrics import precision_score, recall_score, roc_auc_score, roc_curve, precision_recall_curve, accuracy_score, precision_recall_fscore_support
+from sklearn.metrics import precision_score, recall_score, precision_recall_fscore_support
 from datetime import datetime
 import torch
 from yaml import load, dump
 from yaml import CLoader as Loader, CDumper as Dumper
+# import cleantext
+from pyhealth.metrics import multilabel_metrics_fn
+
+
 
 
 def log(metrics: Union[List, Dict], filename: str, results_dir: str,
-        split: str, class_being_tested: str):
+        split: str):
     """Logging function
-        
+
         Parameters
         ----------
         metrics: Union[List, Dict]
@@ -26,43 +32,27 @@ def log(metrics: Union[List, Dict], filename: str, results_dir: str,
             Path to results directory
         split: str
             Train/test split
-        class_being_tested: str
-            Class being tested
     """
     if isinstance(metrics, list):
-        # assert len(metrics) == 3, "Metrics must be of length 3!"
+        assert len(metrics) == 3, "Metrics must be of length 3!"
         results = dict()
-        results['F1'] = metrics[0]
+        results['Accuracy'] = metrics[0]
         results['Precision'] = metrics[1]
-        results['Accuracy'] = metrics[2]
-        results['Recall'] = metrics[3]
-        results['Theta'] = metrics[4]
-        results['F1_Default'] = metrics[5]
-        results['Precision_Default'] = metrics[6]
-        results['Accuracy_Default'] = metrics[7]
-        results['Recall_Default'] = metrics[8]
-
+        results['Recall'] = metrics[2]
     elif isinstance(metrics, np.ndarray):
-    #     # assert len(metrics) == 3, "Metrics must be of length 3!"
+        assert len(metrics) == 3, "Metrics must be of length 3!"
         results = dict()
-        results['F1 (mean, std)'] = metrics[0].tolist()
+        results['Accuracy (mean, std)'] = metrics[0].tolist()
         results['Precision (mean, std)'] = metrics[1].tolist()
-        results['Accuracy (mean, std)'] = metrics[2].tolist()
-        results['Recall (mean, std)'] = metrics[3].tolist()
-        results['Theta (mean, std)'] = metrics[4].tolist()
-        results['F1_Default (mean, std)'] = metrics[5].tolist()
-        results['Precision_Default (mean, std)'] = metrics[6].tolist()
-        results['Accuracy_Default (mean, std)'] = metrics[7].tolist()
-        results['Recall_Default (mean, std)'] = metrics[8].tolist()
+        results['Recall (mean, std)'] = metrics[2].tolist()
     else:
         results = metrics
 
     filename_complete = join(
         results_dir,
-        f'{class_being_tested}_{split}_{filename}_{datetime.now().strftime("%d-%b-%Y-%H_%M_%S")}.txt'
+        f'{split}_{filename}_{datetime.now().strftime("%d-%b-%Y-%H_%M_%S")}.txt'
     )
     print(f'Saving results in {filename_complete}...')
-    print(results)
 
     with open(filename_complete, 'w', encoding='utf-8') as f:
         f.write(json.dumps(results))
@@ -114,15 +104,9 @@ def compute_metrics(y_preds: np.array,
     acc2 = accuracy_score(y_true, y_preds_default)
 
     return [
-        F1,
-        prec,
-        acc,
-        rec,
-        theta,
-        f1_2,
-        prec2,
-        acc2,
-        rec2
+        metrics["accuracy"],
+        metrics["precision_weighted"],
+        metrics["recall_weighted"]
     ]
 
 
@@ -131,28 +115,27 @@ def compute_metrics_bootstrap(y_preds: np.array,
                               average: str = 'weighted',
                               n_bootstrap: int = 100,
                               n_jobs: int = 10):
-    """Compute bootstrapped confidence intervals (CIs) around metrics of interest. 
+    """Compute bootstrapped confidence intervals (CIs) around metrics of interest.
 
         Parameters
         ----------
         y_preds: np.array
             Predictions
-        
+
         y_true: np.array
             Ground truth labels
-        
+
         average: str
-            This parameter is required for multiclass/multilabel targets. If None, 
-            the scores for each class are returned. Otherwise, this determines the 
+            This parameter is required for multiclass/multilabel targets. If None,
+            the scores for each class are returned. Otherwise, this determines the
             type of averaging performed on the data.
 
         n_bootstrap: int
-            Number of boostrap samples to compute CI. 
+            Number of boostrap samples to compute CI.
 
         n_jobs: int
-            Number of jobs to run in parallel. 
+            Number of jobs to run in parallel.
     """
-    print("Inside compute metrics bootstrap")
     output_ =  joblib.Parallel(n_jobs=n_jobs, verbose=1)(
                                 joblib.delayed(compute_metrics)
                                     (y_preds[boostrap_inds], y_true[boostrap_inds]) \
@@ -170,7 +153,7 @@ def get_balanced_data_mask(proba_preds: np.array,
     """Utility function to keep only the most confident predictions, while maintaining class balance
 
         Parameters
-        ---------- 
+        ----------
         proba_preds: Probabilistic labels of data points
         max_num: Maximum number of data points per class
         class_balance: Prevalence of each class
@@ -223,15 +206,15 @@ def fetch_data(dataset='imdb', path='~/', split='train'):
     """Fetches a dataset by its name
 
 	    Parameters
-	    ---------- 
+	    ----------
 	    dataset: str
-	        List of text to be encoded. 
+	        List of text to be encoded.
 
 	    path: str
-	        Path to the stored data. 
+	        Path to the stored data.
 
 	    split: str
-	        Whether to fetch the train or test dataset. Options are one of 'train' or 'test'. 
+	        Whether to fetch the train or test dataset. Options are one of 'train' or 'test'.
     """
     #_dataset_names = ['agnews', 'amazon', 'dbpedia', 'imdb', 'mimic']
     #if dataset not in _dataset_names:
@@ -246,7 +229,7 @@ def fetch_data(dataset='imdb', path='~/', split='train'):
     text = open(f'{join(path, dataset, split)}.txt').readlines()
 
     # if dataset == 'mimic':
-    #     text = [cleantext(line) for line in text]
+    #     text = [cleantext.clean(line) for line in text]
 
     return text
 
