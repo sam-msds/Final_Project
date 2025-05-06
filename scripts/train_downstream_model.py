@@ -1,5 +1,5 @@
 import sys
-sys.path.append('../keyclass/')
+sys.path.append('..')
 
 import argparse
 import numpy as np
@@ -183,10 +183,8 @@ def train(args_cmd):
         utils.log(metrics=training_metrics_with_gt,
                   filename='end_model_with_ground_truth',
                   results_dir=args['results_path'],
-                  split='train'
-                  #,
-                  #class_being_tested=str(args['n_class_being_tested'])
-                  )
+                  split='train',
+                  class_being_tested=str(args['n_class_being_tested']))
 
         # print(end_model_preds_train)
         # print("ytrain lm masked",y_train_lm_masked)
@@ -212,10 +210,8 @@ def train(args_cmd):
     utils.log(metrics=testing_metrics,
               filename='end_model_with_ground_truth',
               results_dir=args['results_path'],
-              split='test'
-              #,
-              #class_being_tested=str(args['n_class_being_tested'])
-              )
+              split='test',
+              class_being_tested=str(args['n_class_being_tested']))
 
     print('\n===== Self-training the downstream classifier =====\n')
 
@@ -267,10 +263,8 @@ def train(args_cmd):
     utils.log(metrics=testing_metrics,
               filename='end_model_with_ground_truth_self_trained',
               results_dir=args['results_path'],
-              split='test'
-              #,
-              #class_being_tested=str(args['n_class_being_tested'])
-              )
+              split='test',
+              class_being_tested=str(args['n_class_being_tested']))
     return testing_metrics
 
 

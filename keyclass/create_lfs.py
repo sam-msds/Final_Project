@@ -1,25 +1,3 @@
-# coding=utf-8
-# MIT License
-
-# Copyright (c) 2020 Carnegie Mellon University, Auton Lab
-
-# Permission is hereby granted, free of charge, to any person obtaining a copy
-# of this software and associated documentation files (the "Software"), to deal
-# in the Software without restriction, including without limitation the rights
-# to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-# copies of the Software, and to permit persons to whom the Software is
-# furnished to do so, subject to the following conditions:
-
-# The above copyright notice and this permission notice shall be included in all
-# copies or substantial portions of the Software.
-
-# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-# IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-# FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
-# AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
-# LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
-# OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
-# SOFTWARE.
 
 import nltk
 
@@ -40,7 +18,6 @@ def get_vocabulary(text_corpus, max_df=1.0, min_df=0.01, ngram_range=(1, 1)):
     vocabulary. 
 
     """
-
     # Vectorizing the vocabulary
     vectorizer = CountVectorizer(max_df=max_df,
                                  min_df=min_df,
@@ -138,29 +115,31 @@ class CreateLabellingFunctions:
                    label_model_lr,
                    label_model_n_epochs,
                    verbose=True,
-                   n_classes=20):
+                   n_classes=2):
         ## main driver function
 
         ## get the bert embeddings of the categories
         self.label_embeddings = self.encoder.encode(sentences=label_names)
+        # print("Label Names = ",label_names)
+        # print("Label embeddings = ",self.label_embeddings)
 
         ## get vocab according to n-grams
-        #self.word_indicator_matrix, self.vocabulary = get_vocabulary(\
-        #    text_corpus=text_corpus,
-        #    max_df=1.0,
-        #    min_df=min_df,
-        #    ngram_range=ngram_range)
-
-        flattened_corpus = [' '.join(text) if isinstance(text, list) else text for text in text_corpus]
         self.word_indicator_matrix, self.vocabulary = get_vocabulary(\
-            text_corpus=flattened_corpus,
+            text_corpus=text_corpus,
             max_df=1.0,
             min_df=min_df,
             ngram_range=ngram_range)
+        # print("Text corpus = ",text_corpus)
+        # print("Word Indicator matrix = ",self.word_indicator_matrix)
 
         # embed vocab to compare with label_embeddings
         self.vocabulary_embeddings = self.encoder.encode(
             sentences=self.vocabulary)
+
+        # print("Vocab = ",self.vocabulary)
+        # print("Vocab embeddings = ",self.vocabulary_embeddings)
+        # print('Label embeddings = ', self.label_embeddings)
+        # print('w')
 
         # labeler.assign_categories_to_keywords(cutoff=0.9)
         self.keywords, self.assigned_category, self.word_indicator_matrix = assign_categories_to_keywords(\
@@ -187,7 +166,7 @@ class CreateLabellingFunctions:
             keywords=self.keywords,
             assigned_category=self.assigned_category)
 
-        #     print('labeler.label_matrix', np.unique(labeler.label_matrix, return_counts=True))
+            # print('labeler.label_matrix', np.unique(labeler.label_matrix, return_counts=True))
         label_model = models.LabelModelWrapper(\
             label_matrix=self.label_matrix,
             n_classes=n_classes,

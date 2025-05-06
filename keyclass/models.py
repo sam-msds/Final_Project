@@ -257,11 +257,6 @@ class Encoder(torch.nn.Module):
                                   disable=not show_progress_bar):
             sentences_batch = sentences_sorted[start_index:start_index +
                                                batch_size]
-            #Susovan
-            if isinstance(sentences_batch[0], list):
-                # Flatten list of lists
-                sentences_batch = [s[0] for s in sentences_batch]
-                
             features = self.model.tokenize(sentences_batch)
             features = sentence_transformers.util.batch_to_device(
                 features, self.device)
@@ -321,10 +316,10 @@ class FeedForwardFlexible(torch.nn.Module):
         for layer in self.layers:
             x = layer(x)
 
-        if mode == 'inference':
-            x = torch.nn.Softmax(dim=-1)(x)
-        elif mode == 'self_train':
-            x = torch.nn.LogSoftmax(dim=-1)(x)
+        # if mode == 'inference':
+        #     x = torch.nn.Sigmoid(x)
+        # elif mode == 'self_train':
+        #     x = torch.nn.Sigmoid(x)
 
         return x
 
@@ -332,7 +327,7 @@ class FeedForwardFlexible(torch.nn.Module):
         preds = self.predict_proba(x_test,
                                    batch_size=batch_size,
                                    raw_text=raw_text)
-        preds = np.argmax(preds, axis=1)
+        # preds = np.argmax(preds, axis=1)
         return preds
 
     def predict_proba(self, x_test, batch_size=128, raw_text=True):
