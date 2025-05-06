@@ -16,7 +16,7 @@ wget --load-cookies /tmp/cookies.txt "https://docs.google.com/uc?export=download
 echo ${green}===Unzipping MIMIC Data...===${reset}
 jar xvf mimic.zip && rm mimic.zip
 
-cd -- "$BASE_PATH"
-cd CS598DLH_Project/keyclass/scripts/
+#cd -- "$BASE_PATH"
+cd /content/drive/MyDrive/CS598DLH_KeyClass_Reproduce/CS598DLH_Project/keyclass/scripts/
 python config_creator.py
 python run_all_configs.py

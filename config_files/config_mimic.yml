@@ -11,7 +11,7 @@ end_model_lr: 1e-4
 end_model_patience: 3
 end_model_weight_decay: 1e-4
 h_sizes:
-- 1
+- 768
 - 3 # Change to 19 in final run
 label_model: data_programming
 label_model_lr: 0.01
@@ -20,11 +20,11 @@ max_num: 500
 min_df: 0.001
 model_path: /content/drive/MyDrive/CS598DLH_KeyClass_Reproduce/CS598DLH_Project/keyclass/models/mimic/
 n_bootstrap: 100
-n_classes: 19 # Change to 19 in final run
+n_classes: 3 # Change to 19 in final run
 n_jobs: 10
 ngram_range: !!python/tuple
 - 1
-- 19
+- 3
 normalize_embeddings: false
 preds_path: /content/drive/MyDrive/CS598DLH_KeyClass_Reproduce/CS598DLH_Project/keyclass/results/mimic/
 q_update_interval: 50
