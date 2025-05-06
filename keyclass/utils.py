@@ -93,7 +93,12 @@ def compute_metrics(y_preds: np.array,
     y_true = y_true.tolist()
     auc_score = roc_auc_score(y_true,y_preds)
     precision, recall, threshold = precision_recall_curve(y_true, y_preds)
-    f1_scores = 2 * recall * precision / (recall + precision)
+    # added new susovan f1_scores = 2 * recall * precision / (recall + precision)
+    f1_scores = np.where(
+    (precision + recall) == 0,
+    0,
+    2 * precision * recall / (precision + recall)
+)
     deno = recall + precision
     f1_scores = np.where(deno <= 0, 0, f1_scores)
     # print("F1 scores", f1_scores)
