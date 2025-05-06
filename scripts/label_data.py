@@ -12,20 +12,27 @@ import torch
 import os
 from os.path import join, exists
 
-def label_converter(args, inp):
+#def label_converter(args, inp):
     # print("Inside Label Converter")
     # print("Arg",args['n_class_being_tested'])
-    return_val = []
-    for line in inp:
-        row = []
-        for c in line:
-            if c=='0' or c=='1':
-                row.append(int(c))
+#    return_val = []
+#    for line in inp:
+#        row = []
+#        for c in line:
+#            if c=='0' or c=='1':
+#                row.append(int(c))
         # return_val.append(row)
         # print(row, row[args['n_class_being_tested']])
+#        return_val.append(row[args['n_class_being_tested']])
+#    return np.array(return_val)
+
+def label_converter(args, inp):
+    return_val = []
+    for line in inp:
+        # Properly split on commas and remove whitespace
+        row = [int(x.strip()) for x in line.strip().split(',')]
         return_val.append(row[args['n_class_being_tested']])
     return np.array(return_val)
-
 
 def run(args_cmd):
 
@@ -114,8 +121,10 @@ def run(args_cmd):
         utils.log(metrics=training_metrics_with_gt,
                   filename='label_model_with_ground_truth',
                   results_dir=args['results_path'],
-                  split='train',
-                  class_being_tested=str(args['n_class_being_tested']))
+                  split='train'
+                  #,
+                  #n_class_being_tested=str(args['n_class_being_tested'])
+                  )
 
 
 # if __name__ == "__main__":
