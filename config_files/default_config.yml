@@ -2,7 +2,7 @@ activation: torch.nn.LeakyReLU()
 average: weighted
 base_encoder: paraphrase-mpnet-base-v2
 criterion: torch.nn.CrossEntropyLoss(reduction='none')
-data_path: /content/drive/MyDrive/CS598DLH_KeyClass_Reproduce/Final_Project/keyclass/scripts/data/
+data_path: /content/drive/MyDrive/CS598DLH_KeyClass_Reproduce/Final_Project/keyclass/data/
 dataset: imdb
 device: cuda
 end_model_batch_size: 128
