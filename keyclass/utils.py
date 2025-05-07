@@ -13,7 +13,7 @@ from yaml import CLoader as Loader, CDumper as Dumper
 
 
 def log(metrics: Union[List, Dict], filename: str, results_dir: str,
-        split: str, class_being_tested: str):
+        split: str, custom_class: str):
     """Logging function
         
         Parameters
@@ -26,7 +26,7 @@ def log(metrics: Union[List, Dict], filename: str, results_dir: str,
             Path to results directory
         split: str
             Train/test split
-        class_being_tested: str
+        custom_class: str
             Class being tested
     """
     if isinstance(metrics, list):
@@ -59,7 +59,7 @@ def log(metrics: Union[List, Dict], filename: str, results_dir: str,
 
     filename_complete = join(
         results_dir,
-        f'{class_being_tested}_{split}_{filename}_{datetime.now().strftime("%d-%b-%Y-%H_%M_%S")}.txt'
+        f'{custom_class}_{split}_{filename}_{datetime.now().strftime("%d-%b-%Y-%H_%M_%S")}.txt'
     )
     print(f'Saving results in {filename_complete}...')
     print(results)

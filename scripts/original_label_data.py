@@ -21,7 +21,7 @@ def label_converter(args, inp):
         for c in line:
             if c == '0' or c == '1':
                 row.append(int(c))
-        return_val.append(row[args['n_class_being_tested']])
+        return_val.append(row[args['n_class_custom']])
     return np.array(return_val)
 
 def run(args_cmd):
@@ -51,7 +51,7 @@ def run(args_cmd):
         print('Class distribution', np.unique(y_train, return_counts=True))
 
     label_names = [args[a] for a in args if 'target' in a]
-    label_names = [label_names[args['n_class_being_tested']]]
+    label_names = [label_names[args['n_class_custom']]]
 
     labeler = create_lfs.CreateLabellingFunctions(
         base_encoder=args['base_encoder'],
@@ -122,7 +122,7 @@ def label_converter(args, inp):
         for c in line:
             if c == '0' or c == '1':
                 row.append(int(c))
-        return_val.append(row[args['n_class_being_tested']])
+        return_val.append(row[args['n_class_custom']])
     return np.array(return_val)
 
 def run(args_cmd):
@@ -152,7 +152,7 @@ def run(args_cmd):
         print('Class distribution', np.unique(y_train, return_counts=True))
 
     label_names = [args[a] for a in args if 'target' in a]
-    label_names = [label_names[args['n_class_being_tested']]]
+    label_names = [label_names[args['n_class_custom']]]
 
     labeler = create_lfs.CreateLabellingFunctions(
         base_encoder=args['base_encoder'],

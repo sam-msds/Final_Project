@@ -23,7 +23,7 @@
 
 # Encode all datasets
 
-DATA_PATH="/content/drive/MyDrive/CS598DLH_KeyClass_Reproduce/CS598DLH_Project/keyclass/scripts/data/"
+DATA_PATH="/content/drive/MyDrive/CS598DLH_KeyClass_Reproduce/Final_Project/keyclass/scripts/data/"
 # DATA_PATH = "../datasets/" # Uncomment
 
 DATASETS=('mimic')

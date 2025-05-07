@@ -184,21 +184,7 @@ def train(args_cmd):
                   filename='end_model_with_ground_truth',
                   results_dir=args['results_path'],
                   split='train',
-                  class_being_tested=str(args['n_class_being_tested']))
-
-        # print(end_model_preds_train)
-        # print("ytrain lm masked",y_train_lm_masked)
-
-    # training_metrics_with_lm = utils.compute_metrics(
-    #     # y_preds=np.argmax(end_model_preds_train, axis=1),
-    #     y_preds=end_model_preds_train,
-    #                                                  y_true=y_train_lm_masked,
-    #                                                  average=args['average'])
-    # utils.log(metrics=training_metrics_with_lm,
-    #           filename='end_model_with_label_model',
-    #           results_dir=args['results_path'],
-    #           split='train',
-    #           class_being_tested=str(args['n_class_being_tested']))
+                  custom_class=str(args['n_class_custom']))
 
     testing_metrics = utils.compute_metrics_bootstrap(
         # y_preds=np.argmax(end_model_preds_test, axis=1),
@@ -211,7 +197,7 @@ def train(args_cmd):
               filename='end_model_with_ground_truth',
               results_dir=args['results_path'],
               split='test',
-              class_being_tested=str(args['n_class_being_tested']))
+              custom_class=str(args['n_class_custom']))
 
     print('\n===== Self-training the downstream classifier =====\n')
 
@@ -264,7 +250,7 @@ def train(args_cmd):
               filename='end_model_with_ground_truth_self_trained',
               results_dir=args['results_path'],
               split='test',
-              class_being_tested=str(args['n_class_being_tested']))
+              custom_class=str(args['n_class_custom']))
     return testing_metrics
 
 
@@ -297,13 +283,6 @@ def test(args_cmd, end_model_path, end_model_self_trained_path):
             y_true=y_train_masked,
             average=args['average'])
         print('training_metrics_with_gt', training_metrics_with_gt)
-
-    # training_metrics_with_lm = utils.compute_metrics(
-    #     # y_preds=np.argmax(end_model_preds_train, axis=1),
-    #     y_preds=end_model_preds_train,
-    #                                                  y_true=y_train_lm_masked,
-    #                                                  average=args['average'])
-    # print('training_metrics_with_lm', training_metrics_with_lm)
 
     testing_metrics = utils.compute_metrics_bootstrap(
         # y_preds=np.argmax(end_model_preds_test, axis=1),
