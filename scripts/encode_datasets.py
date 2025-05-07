@@ -1,6 +1,6 @@
 import sys
 
-sys.path.append('..')
+sys.path.append('../keyClass/')
 import torch
 import argparse
 from os.path import join
