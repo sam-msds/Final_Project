@@ -1,10 +1,10 @@
 BASE_PATH="/content/drive/MyDrive/CS598DLH_KeyClass_Reproduce/"
 
 cd -- "$BASE_PATH"
-git clone https://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@github.com/sam-msds/CS598DLH_Project.git
+git clone https://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@github.com/sam-msds/Final_Project.git
 cd Final_Project
 #mv scripts keyclass
-pip install huggingface_hub[hf_xet] snorkel sentence-transformers transformers 
+#pip install huggingface_hub[hf_xet] snorkel sentence-transformers transformers 
 #cd keyclass/scripts/
 
 mkdir data/
